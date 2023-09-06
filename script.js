@@ -11,13 +11,16 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+
+
+let map, mapEvent;
 navigator.geolocation.getCurrentPosition(function (position) {
 
     const { latitude } = position.coords;
     const { longitude } = position.coords;
     const cords = [latitude, longitude];
 
-    const map = L.map('map').setView(cords, 15);
+    map = L.map('map').setView(cords, 15);
 
     L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 20,
@@ -36,30 +39,45 @@ navigator.geolocation.getCurrentPosition(function (position) {
         .setPopupContent("current position")
         .openPopup();
 
-
     /************* Add marker on clicked position  ***********/
 
-    map.on('click', function (mapEvent) {
-        const { lat } = mapEvent.latlng;
-        const { lng } = mapEvent.latlng;
-        const clickedCords = [lat, lng];
+    map.on('click', function (mapE) {
+        mapEvent = mapE;
+        inputDistance.focus();
+        form.classList.remove("hidden");
 
-        console.log(clickedCords);
-        L.marker(clickedCords)
-            .addTo(map)
-            .bindPopup(L.popup({
-                maxwidth: 250,
-                minwidth: 100,
-                autoClose: false,
-                closeOnClick: false,
-                className: "cycling-popup"
-
-            }))
-            .setPopupContent("Cycling")
-            .openPopup();
     })
 
 }, function () {
     alert("couldn't get your position");
 
 });
+
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
+
+    const { lat, lng } = mapEvent.latlng;
+
+    L.marker({ lat, lng })
+        .addTo(map)
+        .bindPopup(L.popup({
+            maxwidth: 250,
+            minwidth: 100,
+            autoClose: false,
+            closeOnClick: false,
+            className: "cycling-popup"
+
+        }))
+        .setPopupContent("Cycling")
+        .openPopup();
+
+})
+
+
+//  handel toggle
+inputType.addEventListener("change", function () {
+    inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
+    inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
+})
