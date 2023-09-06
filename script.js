@@ -29,6 +29,21 @@ navigator.geolocation.getCurrentPosition(function (position) {
         .bindPopup("<b>Hello world!</b><br>I am a popup.")
         .openPopup();
 
+
+    /************* Add marker on clicked position  ***********/
+
+    map.on('click', function (mapEvent) {
+        const { lat } = mapEvent.latlng;
+        const { lng } = mapEvent.latlng;
+        const clickedCords = [lat, lng];
+
+        console.log(clickedCords);
+        L.marker(clickedCords)
+            .addTo(map)
+            .bindPopup("<b>Hello world!</b><br>I am a popup.")
+            .openPopup();
+    })
+
 }, function () {
     alert("couldn't get your position");
 
