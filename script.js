@@ -13,23 +13,23 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 navigator.geolocation.getCurrentPosition(function (position) {
 
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    const cords = [latitude, longitude];
 
+    const map = L.map('map').setView(cords, 15);
 
-    var map = L.map('map').setView([51.505, -0.09], 13);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     }).addTo(map);
 
-    var marker = L.marker([51.5, -0.09]).addTo(map);
-
-    console.log(position);
-
+    L.marker(cords)
+        .addTo(map)
+        .bindPopup("<b>Hello world!</b><br>I am a popup.")
+        .openPopup();
 
 }, function () {
-    console.log("couldn't get your position");
-
-
+    alert("couldn't get your position");
 
 });
