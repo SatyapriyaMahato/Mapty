@@ -26,7 +26,14 @@ navigator.geolocation.getCurrentPosition(function (position) {
 
     L.marker(cords)
         .addTo(map)
-        .bindPopup("<b>Hello world!</b><br>I am a popup.")
+        .bindPopup(L.popup({
+            maxwidth: 250,
+            minwidth: 100,
+            autoClose: false,
+            closeOnClick: false,
+            className: ".leaflet-popup",
+        }))
+        .setPopupContent("current position")
         .openPopup();
 
 
@@ -40,7 +47,15 @@ navigator.geolocation.getCurrentPosition(function (position) {
         console.log(clickedCords);
         L.marker(clickedCords)
             .addTo(map)
-            .bindPopup("<b>Hello world!</b><br>I am a popup.")
+            .bindPopup(L.popup({
+                maxwidth: 250,
+                minwidth: 100,
+                autoClose: false,
+                closeOnClick: false,
+                className: "cycling-popup"
+
+            }))
+            .setPopupContent("Cycling")
             .openPopup();
     })
 

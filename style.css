@@ -77,9 +77,11 @@ a:visited {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 0.75rem 1.5rem;
 }
+
 .workout--running {
   border-left: 5px solid var(--color-brand--2);
 }
+
 .workout--cycling {
   border-left: 5px solid var(--color-brand--1);
 }
@@ -198,6 +200,7 @@ a:visited {
 
 /* Popup width is defined in JS using options */
 .leaflet-popup .leaflet-popup-content-wrapper {
+  font-family: 'Manrope', sans-serif;
   background-color: var(--color-dark--1);
   color: var(--color-light--2);
   border-radius: 5px;
@@ -215,6 +218,12 @@ a:visited {
 .running-popup .leaflet-popup-content-wrapper {
   border-left: 5px solid var(--color-brand--2);
 }
+
 .cycling-popup .leaflet-popup-content-wrapper {
   border-left: 5px solid var(--color-brand--1);
 }
+
+
+/* .leaflet-popup .leaflet-popup-content {
+  font-family: 'Manrope', sans-serif;
+} */
