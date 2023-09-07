@@ -16,10 +16,10 @@ class Workout {
     ID = (Date.now() + '').slice(-10);
     date = new Date();
 
-    constructor(cords, distance, duration) {
+    constructor(coords, distance, duration) {
         this.distance = distance;
         this.duration = duration;
-        this.cords = cords; //[lat, lng]
+        this.coords = coords; //[lat, lng]
     }
 
     _setDescription() {
@@ -31,8 +31,8 @@ class Workout {
 
 class Running extends Workout {
     type = "running";
-    constructor(cords, distance, duration, cadence) {
-        super(cords, distance, duration);
+    constructor(coords, distance, duration, cadence) {
+        super(coords, distance, duration);
         this.cadence = cadence;
         this.calcPace();
         this._setDescription();
@@ -46,8 +46,8 @@ class Running extends Workout {
 
 class Cycling extends Workout {
     type = "cycling";
-    constructor(cords, distance, duration, elevationGain) {
-        super(cords, distance, duration);
+    constructor(coords, distance, duration, elevationGain) {
+        super(coords, distance, duration);
         this.elevationGain = elevationGain;
         this.calcSpeed();
         this._setDescription();
@@ -62,6 +62,7 @@ class Cycling extends Workout {
 
 
 class App {
+    #zoomLevel = 15;
     #map;
     #mapEvent;
     #activities = [];
@@ -69,6 +70,7 @@ class App {
         this._getPosition();
         form.addEventListener("submit", this._newWorkout.bind(this));
         inputType.addEventListener("change", this._toggleElevationField);
+        containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
 
     }
 
@@ -82,16 +84,16 @@ class App {
     _loadMap(position) {
         const { latitude } = position.coords;
         const { longitude } = position.coords;
-        const cords = [latitude, longitude];
+        const coords = [latitude, longitude];
 
-        this.#map = L.map('map').setView(cords, 15);
+        this.#map = L.map('map').setView(coords, this.#zoomLevel);
 
         L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
             maxZoom: 20,
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         }).addTo(this.#map);
 
-        L.marker(cords)
+        L.marker(coords)
             .addTo(this.#map)
             .bindPopup(L.popup({
                 maxwidth: 250,
@@ -170,7 +172,7 @@ class App {
 
     _renderWorkoutMarker(workout) {
         console.log(workout);
-        L.marker(workout.cords)
+        L.marker(workout.coords)
             .addTo(this.#map)
             .bindPopup(L.popup({
                 maxwidth: 250,
@@ -241,8 +243,21 @@ class App {
 
     }
 
+    _moveToPopup(e) {
+        const workoutEl = e.target.closest(".workout");
+        if (!workoutEl) return;
+        const workoutId = workoutEl.dataset.id;
 
+        const workout = this.#activities.find(wo => wo.ID === workoutId);
 
+        this.#map.setView(workout.coords, this.#zoomLevel, {
+            animate: true,
+            pan: {
+                duration: 1
+            }
+        })
+
+    }
 
 
 }
