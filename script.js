@@ -24,6 +24,7 @@ class Workout {
 }
 
 class Running extends Workout {
+    type = "running";
     constructor(cords, distance, duration, cadenece) {
         super(cords, distance, duration);
         this.cadenece = cadenece;
@@ -37,6 +38,7 @@ class Running extends Workout {
 }
 
 class Cycling extends Workout {
+    type = "cycling";
     constructor(cords, distance, duration, elevationGain) {
         super(cords, distance, duration);
         this.elevationGain = elevationGain;
@@ -114,6 +116,7 @@ class App {
 
         const validInputs = (...inputs) => inputs.every(inp => Number.isFinite(inp));
         const allPositive = (...inputs) => inputs.every(inp => inp > 0);
+
         //  Get data from the form
         const type = inputType.value;
         const distance = +inputDistance.value;
@@ -124,7 +127,6 @@ class App {
 
 
         // check if the data is valid or not
-
         if (type === "running") {
             const cadence = +inputCadence.value;
             if (!validInputs(distance, duration, cadence) || !allPositive(distance, duration, cadence)) {
@@ -148,11 +150,15 @@ class App {
         //  add new objetc to workout array
         this.#activities.push(workout);
 
-        // render workout on map as a marker
-
         inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
 
-        L.marker({ lat, lng })
+        // render workout on map as a marker
+        this.renderWorkoutMarker(workout);
+
+    }
+
+    renderWorkoutMarker(workout) {
+        L.marker(workout.cords)
             .addTo(this.#map)
             .bindPopup(L.popup({
                 maxwidth: 250,
@@ -162,7 +168,7 @@ class App {
                 className: "cycling-popup"
 
             }))
-            .setPopupContent("Cycling")
+            .setPopupContent(workout.type)
             .openPopup();
 
     }
