@@ -44,6 +44,8 @@ class Running extends Workout {
     }
 }
 
+
+
 class Cycling extends Workout {
     type = "cycling";
     constructor(coords, distance, duration, elevationGain) {
@@ -67,7 +69,11 @@ class App {
     #mapEvent;
     #activities = [];
     constructor() {
+
         this._getPosition();
+
+        this._getLocalStorage();
+
         form.addEventListener("submit", this._newWorkout.bind(this));
         inputType.addEventListener("change", this._toggleElevationField);
         containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
@@ -106,6 +112,11 @@ class App {
             .openPopup();
 
         this.#map.on('click', this._showForm.bind(this));
+
+        // to render the markers after refresh as it should be after the load of the map
+        this.#activities.forEach(wo => {
+            this._renderWorkoutMarker(wo);
+        })
 
     }
     _showForm(mapE) {
@@ -167,6 +178,8 @@ class App {
         this._renderWorkoutMarker(workout);
         this._renderWorkout(workout);
         this._hideForm();
+
+        this._setLocalStorage();
 
     }
 
@@ -257,6 +270,17 @@ class App {
             }
         })
 
+    }
+
+    _setLocalStorage() {
+        localStorage.setItem("workouts", JSON.stringify(this.#activities));
+    }
+
+    _getLocalStorage() {
+        this.#activities = JSON.parse(localStorage.getItem("workouts"));
+        this.#activities.forEach(wo => {
+            this._renderWorkout(wo);
+        })
     }
 
 
