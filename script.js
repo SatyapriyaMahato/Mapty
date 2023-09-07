@@ -31,9 +31,9 @@ class Workout {
 
 class Running extends Workout {
     type = "running";
-    constructor(cords, distance, duration, cadenece) {
+    constructor(cords, distance, duration, cadence) {
         super(cords, distance, duration);
-        this.cadenece = cadenece;
+        this.cadence = cadence;
         this.calcPace();
         this._setDescription();
     }
@@ -159,14 +159,16 @@ class App {
         //  add new objetc to workout array
         this.#activities.push(workout);
 
-        inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
+
 
         // render workout on map as a marker
-        this.renderWorkoutMarker(workout);
+        this._renderWorkoutMarker(workout);
+        this._renderWorkout(workout);
+        this._hideForm();
 
     }
 
-    renderWorkoutMarker(workout) {
+    _renderWorkoutMarker(workout) {
         console.log(workout);
         L.marker(workout.cords)
             .addTo(this.#map)
@@ -182,6 +184,66 @@ class App {
             .openPopup();
 
     }
+
+    _renderWorkout(workout) {
+        let html = `
+        <li class="workout workout--${workout.type}" data-id="${workout.ID}">
+            <h2 class="workout__title">${workout.description}</h2>
+            <div class="workout__details">
+                <span class="workout__icon">${workout.type == "running" ? "🏃" : "🚴‍♀️"}</span>
+                <span class="workout__value">${workout.distance}</span>
+                <span class="workout__unit">km</span>
+            </div>
+            <div class="workout__details">
+                <span class="workout__icon">⏱</span>
+                <span class="workout__value">${workout.duration}</span>
+                <span class="workout__unit">min</span>
+            </div>`;
+
+        if (workout.type == "running") {
+            html += `
+                <div class="workout__details">
+                    <span class="workout__icon">⚡️</span>
+                    <span class="workout__value">${workout.pace.toFixed(1)}</span>
+                    <span class="workout__unit">min/km</span>
+                </div>
+                <div class="workout__details">
+                    <span class="workout__icon">🦶🏼</span>
+                    <span class="workout__value">${workout.cadence}</span>
+                    <span class="workout__unit">spm</span>
+                </div>
+            </li>`
+        }
+
+        if (workout.type == "cycling") {
+            html += `
+                <div class="workout__details">
+                    <span class="workout__icon">⚡️</span>
+                    <span class="workout__value">${workout.speed.toFixed(1)}</span>
+                    <span class="workout__unit">km/h</span>
+                </div>
+                <div class="workout__details">
+                    <span class="workout__icon">⛰</span>
+                    <span class="workout__value">${workout.elevation}</span>
+                    <span class="workout__unit">m</span>
+                </div>
+            </li> `
+        }
+        form.insertAdjacentHTML("afterend", html);
+    }
+
+    _hideForm() {
+        inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
+        form.style.display = "none";
+        form.classList.add("hidden");
+
+        setTimeout(() => form.style.display = "grid", 1000);
+
+    }
+
+
+
+
 
 }
 
