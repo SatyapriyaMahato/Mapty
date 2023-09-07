@@ -11,6 +11,7 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 
+
 class Workout {
     ID = (Date.now() + '').slice(-10);
     date = new Date();
@@ -67,6 +68,7 @@ class App {
     #map;
     #mapEvent;
     #activities = [];
+    #markers = [];
     constructor() {
 
         this._getPosition();
@@ -183,7 +185,7 @@ class App {
     }
 
     _renderWorkoutMarker(workout) {
-        L.marker(workout.coords)
+        const marker = new L.marker(workout.coords)
             .addTo(this.#map)
             .bindPopup(L.popup({
                 maxwidth: 250,
@@ -196,17 +198,28 @@ class App {
             .setPopupContent(workout.description)
             .openPopup();
 
+        this.#markers.push(marker);
+        console.log(this.#markers);
+    }
+
+    _removeWorkoutMarker(m) {
+        this.#map.removeLayer(m);
     }
 
     _renderWorkout(workout) {
         let html = `
         <li class="workout workout--${workout.type}" data-id="${workout.ID}">
             <h2 class="workout__title">${workout.description}</h2>
+            <div class="workout__modify">
+                <span class="workout__edit__icon">&#10000</span>
+                <span class="workout__del__icon">&#10005</span>
+            </div>
             <div class="workout__details">
                 <span class="workout__icon">${workout.type == "running" ? "🏃" : "🚴‍♀️"}</span>
                 <span class="workout__value">${workout.distance}</span>
                 <span class="workout__unit">km</span>
             </div>
+            
             <div class="workout__details">
                 <span class="workout__icon">⏱</span>
                 <span class="workout__value">${workout.duration}</span>
@@ -237,13 +250,47 @@ class App {
                 </div>
                 <div class="workout__details">
                     <span class="workout__icon">⛰</span>
-                    <span class="workout__value">${workout.elevation}</span>
+                    <span class="workout__value">${workout.elevationGain}</span>
                     <span class="workout__unit">m</span>
                 </div>
             </li> `
         }
         form.insertAdjacentHTML("afterend", html);
+
+        const editBtn = document.querySelector(".workout__edit__icon");
+        const delBtn = document.querySelector(".workout__del__icon");
+
+        delBtn.addEventListener("click", this._delWorkout.bind(this));
     }
+
+    _delWorkout(e) {
+        const workoutEl = e.target.closest(".workout");
+        if (!workoutEl) return;
+
+        const workoutId = workoutEl.dataset.id;
+        const workoutIndex = this.#activities.findIndex((obj) => obj.ID === workoutId);
+
+        if (workoutIndex !== -1) {
+            // Remove the workout from the activities array
+            this.#activities.splice(workoutIndex, 1);
+
+            // Get the marker associated with this workout
+            const workoutMarker = this.#markers[workoutIndex];
+
+            // Remove the workout marker from the map
+            this.#map.removeLayer(workoutMarker);
+
+            // Remove the marker from the markers array
+            this.#markers.splice(workoutIndex, 1);
+
+            // Remove the workout data from the HTML
+            workoutEl.remove();
+
+            // Update the local storage
+            this._setLocalStorage();
+        }
+    }
+
 
     _hideForm() {
         inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
@@ -256,7 +303,10 @@ class App {
 
     _moveToPopup(e) {
         const workoutEl = e.target.closest(".workout");
+
+        if (e.target.closest(".workout__modify")) return;
         if (!workoutEl) return;
+
         const workoutId = workoutEl.dataset.id;
 
         const workout = this.#activities.find(wo => wo.ID === workoutId);

@@ -89,7 +89,7 @@ a:visited {
 .workout__title {
   font-size: 1.7rem;
   font-weight: 600;
-  grid-column: 1 / -1;
+  grid-column: 1 / 4;
 }
 
 .workout__details {
@@ -113,6 +113,16 @@ a:visited {
   color: var(--color-light--1);
   text-transform: uppercase;
   font-weight: 800;
+}
+
+.workout__modify {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.workout__edit__icon,
+.workout__del__icon {
+  font-size: 1.7rem;
 }
 
 .form {
