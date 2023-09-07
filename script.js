@@ -16,7 +16,7 @@ class Workout {
     ID = (Date.now() + '').slice(-10);
     date = new Date();
 
-    constructor(distance, duration, cords) {
+    constructor(cords, distance, duration) {
         this.distance = distance;
         this.duration = duration;
         this.cords = cords; //[lat, lng]
@@ -24,8 +24,8 @@ class Workout {
 }
 
 class Running extends Workout {
-    constructor(distance, duration, cords, cadenece) {
-        super(distance, duration, cords);
+    constructor(cords, distance, duration, cadenece) {
+        super(cords, distance, duration);
         this.cadenece = cadenece;
         this.calcPace();
     }
@@ -37,8 +37,8 @@ class Running extends Workout {
 }
 
 class Cycling extends Workout {
-    constructor(distance, duration, cords, elevationGain) {
-        super(distance, duration, cords);
+    constructor(cords, distance, duration, elevationGain) {
+        super(cords, distance, duration);
         this.elevationGain = elevationGain;
         this.calcSpeed();
     }
@@ -53,6 +53,7 @@ class Cycling extends Workout {
 class App {
     #map;
     #mapEvent;
+    #activities = [];
     constructor() {
         this._getPosition();
         form.addEventListener("submit", this._newWorkout.bind(this));
@@ -118,34 +119,38 @@ class App {
         const distance = +inputDistance.value;
         const duration = +inputDuration.value;
 
+        const { lat, lng } = this.#mapEvent.latlng;
+        let workout;
+
 
         // check if the data is valid or not
+
         if (type === "running") {
             const cadence = +inputCadence.value;
             if (!validInputs(distance, duration, cadence) || !allPositive(distance, duration, cadence)) {
                 return alert("Enter valid input");
 
             }
+            // if workout is running create running object
+            workout = new Running([lat, lng], distance, duration, cadence);
         }
+
         if (type === "cycling") {
             const elevation = +inputElevation.value;
             if (!validInputs(distance, duration, elevation) || !allPositive(distance, duration)) {
                 return alert("Enter valid input");
 
             }
+            // if workout is cycling create cycling objetct
+            workout = new Cycling([lat, lng], distance, duration, elevation);
         }
 
-        // if workout is running create running object
-
-        // if workout is cycling create cycling onjetcy
-
         //  add new objetc to workout array
+        this.#activities.push(workout);
 
         // render workout on map as a marker
 
         inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
-
-        const { lat, lng } = this.#mapEvent.latlng;
 
         L.marker({ lat, lng })
             .addTo(this.#map)
@@ -161,6 +166,7 @@ class App {
             .openPopup();
 
     }
+
 }
 
 const app = new App();
