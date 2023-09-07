@@ -2,7 +2,6 @@
 
 // prettier-ignore
 
-
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
@@ -81,10 +80,12 @@ class App {
     }
 
     _getPosition() {
-        navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), function () {
-            alert("couldn't get your position");
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), function () {
+                alert("couldn't get your position");
 
-        });
+            });
+        }
     }
 
     _loadMap(position) {
@@ -172,8 +173,6 @@ class App {
         //  add new objetc to workout array
         this.#activities.push(workout);
 
-
-
         // render workout on map as a marker
         this._renderWorkoutMarker(workout);
         this._renderWorkout(workout);
@@ -184,7 +183,6 @@ class App {
     }
 
     _renderWorkoutMarker(workout) {
-        console.log(workout);
         L.marker(workout.coords)
             .addTo(this.#map)
             .bindPopup(L.popup({
@@ -277,12 +275,21 @@ class App {
     }
 
     _getLocalStorage() {
-        this.#activities = JSON.parse(localStorage.getItem("workouts"));
+        const data = JSON.parse(localStorage.getItem("workouts"));
+
+        if (!data) return;
+
+        this.#activities = data;
+
         this.#activities.forEach(wo => {
             this._renderWorkout(wo);
         })
     }
 
+    reset() {
+        localStorage.removeItem("workouts");
+        location.reload();
+    }
 
 }
 
