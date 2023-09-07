@@ -12,72 +12,85 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 
+class App {
+    #map;
+    #mapEvent;
+    constructor() {
+        this._getPosition();
+        form.addEventListener("submit", this._newWorkout.bind(this));
+        inputType.addEventListener("change", this._toggleElevationField);
 
-let map, mapEvent;
-navigator.geolocation.getCurrentPosition(function (position) {
+    }
 
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
-    const cords = [latitude, longitude];
+    _getPosition() {
+        navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), function () {
+            alert("couldn't get your position");
 
-    map = L.map('map').setView(cords, 15);
+        });
+    }
 
-    L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    }).addTo(map);
+    _loadMap(position) {
+        const { latitude } = position.coords;
+        const { longitude } = position.coords;
+        const cords = [latitude, longitude];
 
-    L.marker(cords)
-        .addTo(map)
-        .bindPopup(L.popup({
-            maxwidth: 250,
-            minwidth: 100,
-            autoClose: false,
-            closeOnClick: false,
-            className: ".leaflet-popup",
-        }))
-        .setPopupContent("current position")
-        .openPopup();
+        this.#map = L.map('map').setView(cords, 15);
 
-    /************* Add marker on clicked position  ***********/
+        L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }).addTo(this.#map);
 
-    map.on('click', function (mapE) {
-        mapEvent = mapE;
+        L.marker(cords)
+            .addTo(this.#map)
+            .bindPopup(L.popup({
+                maxwidth: 250,
+                minwidth: 100,
+                autoClose: false,
+                closeOnClick: false,
+                className: ".leaflet-popup",
+            }))
+            .setPopupContent("current position")
+            .openPopup();
+
+        this.#map.on('click', this._showForm.bind(this));
+
+    }
+    _showForm(mapE) {
+        this.#mapEvent = mapE;
         inputDistance.focus();
         form.classList.remove("hidden");
 
-    })
-
-}, function () {
-    alert("couldn't get your position");
-
-});
-
-form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
-
-    const { lat, lng } = mapEvent.latlng;
-
-    L.marker({ lat, lng })
-        .addTo(map)
-        .bindPopup(L.popup({
-            maxwidth: 250,
-            minwidth: 100,
-            autoClose: false,
-            closeOnClick: false,
-            className: "cycling-popup"
-
-        }))
-        .setPopupContent("Cycling")
-        .openPopup();
-
-})
+    }
 
 
-//  handel toggle
-inputType.addEventListener("change", function () {
-    inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
-    inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
-})
+    _toggleElevationField() {
+        inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
+        inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
+    }
+
+
+    _newWorkout(e) {
+        e.preventDefault();
+
+        inputDistance.value = inputDuration.value = inputElevation.value = inputCadence.value = '';
+
+        const { lat, lng } = this.#mapEvent.latlng;
+
+        L.marker({ lat, lng })
+            .addTo(this.#map)
+            .bindPopup(L.popup({
+                maxwidth: 250,
+                minwidth: 100,
+                autoClose: false,
+                closeOnClick: false,
+                className: "cycling-popup"
+
+            }))
+            .setPopupContent("Cycling")
+            .openPopup();
+
+    }
+}
+
+const app = new App();
