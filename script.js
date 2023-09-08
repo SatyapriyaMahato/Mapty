@@ -64,6 +64,7 @@ class App {
     #zoomLevel = 15;
     #map;
     #mapEvent;
+    #mapEvents = [];
     #activities = [];
     #markers = [];
 
@@ -117,7 +118,10 @@ class App {
     }
 
     _showForm(mapE) {
+
         this.#mapEvent = mapE;
+
+        this.#mapEvents.push(this.#mapEvent);
         inputDistance.focus();
         form.classList.remove("hidden");
     }
@@ -184,7 +188,6 @@ class App {
             .openPopup();
 
         this.#markers.push(marker);
-        console.log(this.#markers);
     }
 
     _removeWorkoutMarker(m) {
@@ -246,6 +249,8 @@ class App {
         const delBtn = document.querySelector(".workout__del__icon");
 
         delBtn.addEventListener("click", this._delWorkout.bind(this));
+        editBtn.addEventListener("click", this._editWorkout.bind(this));
+
     }
 
     _delWorkout(e) {
@@ -256,24 +261,38 @@ class App {
         const workoutIndex = this.#activities.findIndex((obj) => obj.ID === workoutId);
 
         if (workoutIndex !== -1) {
-            // Remove the workout from the activities array
-            this.#activities.splice(workoutIndex, 1);
 
-            // Get the marker associated with this workout
             const workoutMarker = this.#markers[workoutIndex];
-
-            // Remove the workout marker from the map
             this.#map.removeLayer(workoutMarker);
 
-            // Remove the marker from the markers array
+            this.#activities.splice(workoutIndex, 1);
             this.#markers.splice(workoutIndex, 1);
 
-            // Remove the workout data from the HTML
             workoutEl.remove();
 
-            // Update the local storage
             this._setLocalStorage();
         }
+    }
+
+    _editWorkout(e) {
+        const workoutEl = e.target.closest(".workout");
+        if (!workoutEl) return;
+
+        const workoutId = workoutEl.dataset.id;
+        const workoutIndex = this.#activities.findIndex((obj) => obj.ID === workoutId);
+        form.classList.remove("hidden");
+        this.#activities.splice(workoutIndex, 1);
+
+        if (workoutIndex !== -1) {
+
+            const clickedPoint = this.#mapEvents[workoutIndex];
+            this.#mapEvent = clickedPoint;
+            workoutEl.remove();
+
+            this._setLocalStorage();
+
+        }
+
     }
 
     _hideForm() {
