@@ -40,8 +40,15 @@ a:visited {
   color: var(--color-brand--1);
 }
 
+/*MAIN*/
+.main {
+  width: 100%;
+  display: flex;
+}
+
 /* SIDEBAR */
 .sidebar {
+  width: 100%;
   flex-basis: 50rem;
   background-color: var(--color-dark--1);
   padding: 3rem 5rem 4rem 5rem;
@@ -73,9 +80,13 @@ a:visited {
   margin-bottom: 1.75rem;
   cursor: pointer;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem 1.5rem;
+}
+
+.workout>* {
+  flex-basis: 100%;
 }
 
 .workout--running {
@@ -89,12 +100,28 @@ a:visited {
 .workout__title {
   font-size: 1.7rem;
   font-weight: 600;
-  grid-column: 1 / 4;
+  flex: 1 0 60%;
+}
+
+.workout__modify {
+  display: flex;
+  justify-content: end;
+  flex: 1 0 20%;
+}
+
+.workout__edit__icon {
+  color: #00c46a;
+
+}
+
+.workout__del__icon {
+  color: rgb(246, 103, 103);
 }
 
 .workout__details {
   display: flex;
   align-items: baseline;
+  flex: 1 0 20%;
 }
 
 .workout__icon {
@@ -115,9 +142,10 @@ a:visited {
   font-weight: 800;
 }
 
-.workout__modify {
-  display: flex;
-  justify-content: space-evenly;
+
+
+.workout__edit__icon {
+  margin-right: 1rem;
 }
 
 .workout__edit__icon,
@@ -204,6 +232,7 @@ a:visited {
 /* MAP */
 #map {
   flex: 1;
+  /* width: 100%; */
   height: 100%;
   background-color: var(--color-light--1);
 }
@@ -234,6 +263,40 @@ a:visited {
 }
 
 
-/* .leaflet-popup .leaflet-popup-content {
+.leaflet-popup .leaflet-popup-content {
   font-family: 'Manrope', sans-serif;
-} */
+}
+
+@media (max-width: 1080px) {
+  .main {
+    flex-direction: column-reverse;
+  }
+
+  .sidebar,
+  #map {
+    min-height: 40vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .workout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .workout__title {
+    font-size: 1.7rem;
+    font-weight: 600;
+    grid-column: 1/2;
+  }
+
+  .workout__details {
+    flex: 1 0 35%;
+  }
+
+  .form {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+
+}

@@ -104,9 +104,10 @@ class App {
                 minwidth: 100,
                 autoClose: false,
                 closeOnClick: false,
+                closeButton: false,
                 className: ".leaflet-popup",
             }))
-            .setPopupContent("current position")
+            .setPopupContent("you are here")
             .openPopup();
 
         this.#map.on('click', this._showForm.bind(this));
