@@ -279,6 +279,10 @@ a:visited {
 }
 
 @media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+
   .workout {
     grid-template-columns: 1fr 1fr;
   }
